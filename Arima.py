@@ -16,4 +16,27 @@ def parser(x):
 series = read_csv('CMPE-256-Large-Scale-Analytics-/data/bitstamp.csv',
                   header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 
-print(series.head(10))
+# print(series.head(10))
+# Split the data into individual dataframes
+price = series.iloc[:, [6]].fillna(method='ffill').head(1000).values
+open = series.iloc[:, [0]].fillna(method='ffill').head(1000).values
+high = series.iloc[:, [1]].fillna(method='ffill').head(1000).values
+low = series.iloc[:, [2]].fillna(method='ffill').head(1000).values
+close = series.iloc[:, [3]].fillna(method='ffill').head(1000).values
+
+# Split the individual dataframes to train and test
+size = int(len(price) * 0.66)
+trainPrice, testPrice = price[0:size], price[size:len(price)]
+trainOpen, testOpen = open[0:size], open[size: len(price)]
+trainHigh, testHigh = high[0:size], high[size: len(price)]
+trainLow, testLow = low[0:size], low[size: len(price)]
+trainClose, testClose = close[0:size], close[size: len(price)]
+
+# Converting the dataframes into lists
+historyPrice = [x for x in trainPrice]
+historyOpen = [x for x in trainOpen]
+historyHigh = [x for x in trainHigh]
+historyLow = [x for x in trainLow]
+historyClose = [x for x in trainClose]
+
+
