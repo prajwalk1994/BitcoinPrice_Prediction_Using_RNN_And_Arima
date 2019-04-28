@@ -32,10 +32,3 @@ df = pd.read_csv("bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")
 df['date'] = pd.to_datetime(df['Timestamp'],unit='s').dt.date
 group = df.groupby('date')
 Real_Price = group['Weighted_Price'].mean()
-prediction_days = 365
-df_train= Real_Price[:len(Real_Price)-prediction_days]
-df_test= Real_Price[len(Real_Price)-prediction_days:]
-training_set = df_train.values
-training_set = np.reshape(training_set, (len(training_set), 1))
-from sklearn.preprocessing import MinMaxScaler
-sc = MinMaxScaler()
