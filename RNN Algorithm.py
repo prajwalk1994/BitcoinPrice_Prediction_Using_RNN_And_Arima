@@ -24,3 +24,11 @@ series
 #pyplot.show()
 series1 = series.iloc[:,[6]]
 series1
+
+import numpy as np 
+import pandas as pd 
+from matplotlib import pyplot as plt
+df = pd.read_csv("bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")
+df['date'] = pd.to_datetime(df['Timestamp'],unit='s').dt.date
+group = df.groupby('date')
+Real_Price = group['Weighted_Price'].mean()
