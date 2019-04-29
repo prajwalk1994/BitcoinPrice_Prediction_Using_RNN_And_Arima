@@ -39,3 +39,7 @@ training_set = df_train.values
 training_set = np.reshape(training_set, (len(training_set), 1))
 from sklearn.preprocessing import MinMaxScaler
 sc = MinMaxScaler()
+training_set = sc.fit_transform(training_set)
+X_train = training_set[0:len(training_set)-1]
+y_train = training_set[1:len(training_set)]
+X_train = np.reshape(X_train, (len(X_train), 1, 1))
