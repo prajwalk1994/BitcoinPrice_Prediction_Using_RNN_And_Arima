@@ -44,3 +44,7 @@ window = model_fit.k_ar
 print(window)
 coef = model_fit.params
 print(coef)
+# walk forward over time steps in test
+history = train[len(train)-window:]
+history = [history[i] for i in range(len(history))]
+predictions = list()
