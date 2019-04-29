@@ -39,4 +39,11 @@ historyHigh = [x for x in trainHigh]
 historyLow = [x for x in trainLow]
 historyClose = [x for x in trainClose]
 
-
+# Predicting the price of Bitcoin
+for t in range(testLen):
+    priceModel = ARIMA(historyPrice, order=(5, 1, 0)).fit(disp=0)
+    outputPrice = priceModel.forecast()
+    predict = list()
+    predict.append(outputPrice[0])
+    outputTest.append(testPrice[t])
+    historyPrice.append(testPrice[t])
