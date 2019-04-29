@@ -5,6 +5,7 @@ from pandas import DataFrame
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from statsmodels.tsa.arima_model import ARIMA
+import numpy as np
 
 def parser(x):
     dateout = []
@@ -41,9 +42,38 @@ historyClose = [x for x in trainClose]
 
 # Predicting the price of Bitcoin
 for t in range(testLen):
+    # Models for all the fields in the training dataset
     priceModel = ARIMA(historyPrice, order=(5, 1, 0)).fit(disp=0)
+    openModel = ARIMA(historyOpen, order=(5, 1, 0)).fit(disp=0)
+    highModel = ARIMA(historyHigh, order=(5, 1, 0)).fit(disp=0)
+    lowModel = ARIMA(historyLow, order=(5, 1, 0)).fit(disp=0)
+    closeModel = ARIMA(historyClose, order=(5, 1, 0)).fit(disp=0)
+    # Predict the future value
     outputPrice = priceModel.forecast()
+    outputOpen = openModel.forecast()
+    outputHigh = highModel.forecast()
+    outputLow = lowModel.forecast()
+    outputClose = closeModel.forecast()
+    # Create a new list for all the predicted values
     predict = list()
+    # Add the predicted values to the predicted list
     predict.append(outputPrice[0])
+    predict.append(outputOpen[0])
+    predict.append(outputHigh[0])
+    predict.append(outputLow[0])
+    predict.append(outputClose[0])
+    # Append the output of the test to output object
+    outputTest = list()
     outputTest.append(testPrice[t])
+    outputTest.append(testOpen[t])
+    outputTest.append(testHigh[t])
+    outputTest.append(testLow[t])
+    outputTest.append(testClose[t])
+    # Add the test value to history object
     historyPrice.append(testPrice[t])
+    historyOpen.append(testOpen[t])
+    historyHigh.append(testHigh[t])
+    historyLow.append(testLow[t])
+    historyClose.append(testClose[t])
+# Save the output to a csv file
+np.savetxt("arimaOutput.csv", outputTest, delimiter=",", fmt='%s', header=header)
