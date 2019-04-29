@@ -37,3 +37,10 @@ print(len(X))
 train, test = X[1:len(X)-1000], X[len(X)-1000:]
 print(len(train))
 print(len(test))
+# train autoregression
+model = AR(train)
+model_fit = model.fit()
+window = model_fit.k_ar
+print(window)
+coef = model_fit.params
+print(coef)
