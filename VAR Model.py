@@ -48,3 +48,14 @@ print(coef)
 history = train[len(train)-window:]
 history = [history[i] for i in range(len(history))]
 predictions = list()
+for t in range(len(test)):
+	length = len(history)
+	lag = [history[i] for i in range(length-window,length)]
+	yhat = coef[0]
+	for d in range(window):
+		yhat += coef[d] * lag[window-d-1]
+	obs = test[t]
+	predictions.append(yhat+17)
+	history.append(obs)
+	print('predicted=%f, expected=%f' % (yhat, obs))
+	
