@@ -17,9 +17,22 @@ def parser(x):
     return dateout
 
 
-series = read_csv('bitstamp.csv', header=0,
-                  parse_dates=[0], index_col=0, squeeze=True)
-price = series.iloc[:, [6]].fillna(method ='ffill')
+traindata = read_csv('train.csv', header=0,parse_dates=[0], index_col=0,squeeze=True)
+testdata  = read_csv('test.csv', header=0,parse_dates=[0], index_col=0,squeeze=True)
+
+traindata['date'] = to_datetime(traindata['Timestamp'],unit='s').dt.date
+testdata['date'] = to_datetime(testdata['Timestamp'],unit='s').dt.date
+
+trainDatagroup=traindata.groupby('date')
+trainprice=trainDatagroup['Weighted_Price'].mean().values
+testDatagroup=testdata.groupby('date')
+testprice=testDatagroup['Weighted_Price'].mean().values
+
+#pricetrain = traindata.iloc[:, [6]].fillna(method ='ffill')
+#pricetest= testdata.iloc[:, [6]].fillna(method ='ffill')
+
+print(testdata)
+#print(test)
 
 
 #series = Series.from_csv('bitmap.csv', header=0)
@@ -29,12 +42,15 @@ price = series.iloc[:, [6]].fillna(method ='ffill')
 #train, test = X[0:len(X)-10], X[len(X)-10:]
 #print(train[:10])
 
-series = read_csv('bitstamp.csv', header=0,parse_dates=[0], index_col=0, squeeze=True)
-price = series.iloc[:, [6]].fillna(method ='ffill')
+#series = read_csv('bitstamp.csv', header=0,parse_dates=[0], index_col=0, squeeze=True)
+#price = series.iloc[:, [6]].fillna(method ='ffill')
 # split dataset
-X = price.values
-print(len(X))
-train, test = X[1:len(X)-1000], X[len(X)-1000:]
+train = pricetrain.tail(5000).values
+test=   pricetest.head(1000).values
+
+
+
+#train, test = X[1:len(X)-1000], X[len(X)-1000:]
 print(len(train))
 print(len(test))
 # train autoregression
@@ -55,7 +71,32 @@ for t in range(len(test)):
 	for d in range(window):
 		yhat += coef[d] * lag[window-d-1]
 	obs = test[t]
-	predictions.append(yhat+17)
+	predictions.append(yhat)
 	history.append(obs)
 	print('predicted=%f, expected=%f' % (yhat, obs))
-	
+error = mean_squared_error(test, predictions)
+print('Test MSE: %.3f' % error)
+# plot
+#pyplot.plot(test)
+#pyplot.plot(predictions, color='red')
+#pyplot.show()
+
+#from statsmodels.tsa.vector_ar.var_model import VAR
+
+#model = VAR(train)
+#model_fit = model.fit()
+
+# make prediction on validation
+#prediction = model_fit.forecast(model_fit.y, steps=len(valid))
+#print(prediction)
+# print(len(test))
+#temp = [x for x in train]
+# train autoregression
+#model = AR(temp)
+#model_fit = model.fit()
+#print('Lag: %s' % model_fit.k_ar)
+#print('Coefficients: %s' % model_fit.params)
+# make predictions
+#predictions = model_fit.predict(start=len(train), end=len(train)+len(test)-1, dynamic=False)
+#for i in range(len(predictions)):
+#	print('predicted=%f, expected=%f' % (predictions[i], test[i]))
