@@ -50,13 +50,17 @@ regressor.add(Dense(units = 1))
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # Fitting the RNN to the Training set
-regressor.fit(X_train, y_train, batch_size = 5, epochs = 100)
+regressor.fit(A_train, b_train, batch_size = 5, epochs = 100)
+
+#Making predictions
+df_test= Real_Price_test[:len(Real_Price_test)]
 
 test_set = df_test.values
-inputs = np.reshape(test_set, (len(test_set), 1))
-inputs = sc.transform(inputs)
-inputs = np.reshape(inputs, (len(inputs), 1, 1))
-predicted_BTC_price = regressor.predict(inputs)
+
+input_data = np.reshape(test_set, (len(test_set), 1))
+input_data = sc.transform(input_data)
+input_data = np.reshape(input_data, (len(input_data), 1, 1))
+predicted_BTC_price = regressor.predict(input_data)
 predicted_BTC_price = sc.inverse_transform(predicted_BTC_price)
 
 plt.figure(figsize=(25,15), dpi=80, facecolor='w', edgecolor='k')
