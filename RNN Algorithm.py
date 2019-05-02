@@ -27,18 +27,15 @@ Real_Price_test = group_test['Weighted_Price'].mean()
 
 timestamps = group_test['date'].unique().values
 
-df_train= Real_Price[:len(Real_Price)-prediction_days]
-df_test= Real_Price[len(Real_Price)-prediction_days:]
+#Data preprocess
+df_train= Real_Price_train[:len(Real_Price_train)]
 training_set = df_train.values
 training_set = np.reshape(training_set, (len(training_set), 1))
-from sklearn.preprocessing import MinMaxScaler
 sc = MinMaxScaler()
 training_set = sc.fit_transform(training_set)
-X_train = training_set[0:len(training_set)-1]
-y_train = training_set[1:len(training_set)]
-X_train = np.reshape(X_train, (len(X_train), 1, 1))
-
-
+A_train = training_set[0:len(training_set)-1]
+b_train = training_set[1:len(training_set)]
+A_train = np.reshape(A_train, (len(A_train), 1, 1))
 
 # Initialising the RNN
 regressor = Sequential()
@@ -53,14 +50,32 @@ regressor.add(Dense(units = 1))
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # Fitting the RNN to the Training set
-regressor.fit(X_train, y_train, batch_size = 5, epochs = 100)
+regressor.fit(A_train, b_train, batch_size = 5, epochs = 100)
+
+#Making predictions
+df_test= Real_Price_test[:len(Real_Price_test)]
 
 test_set = df_test.values
-inputs = np.reshape(test_set, (len(test_set), 1))
-inputs = sc.transform(inputs)
-inputs = np.reshape(inputs, (len(inputs), 1, 1))
-predicted_BTC_price = regressor.predict(inputs)
+
+input_data = np.reshape(test_set, (len(test_set), 1))
+input_data = sc.transform(input_data)
+input_data = np.reshape(input_data, (len(input_data), 1, 1))
+predicted_BTC_price = regressor.predict(input_data)
 predicted_BTC_price = sc.inverse_transform(predicted_BTC_price)
+
+#Writing results to csv
+predictions = list()
+for t in range(len(test_set)):
+    output = list()
+    output.append(timestamps[t][0].strftime('%m-%d-%y'))
+    output.append(predicted_BTC_price[t][0])
+    predictions.append(output)
+predicted_BTC_price_df = DataFrame(predictions)
+predicted_BTC_price_df.to_csv('RNNOutput.csv', sep=',')
+
+#calculating MSE
+error = mean_squared_error(test_set,predicted_BTC_price)
+
 
 plt.figure(figsize=(25,15), dpi=80, facecolor='w', edgecolor='k')
 ax = plt.gca()  
