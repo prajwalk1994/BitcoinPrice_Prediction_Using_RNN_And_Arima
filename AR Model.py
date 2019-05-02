@@ -22,11 +22,12 @@ def parser(x):
 traindata = read_csv('/train.csv')
 testdata  = read_csv('/test.csv')
 
+#Data Preprocessing
+traindatafill = traindata.iloc[:, [6]].fillna(method ='ffill')
+testdatafill =  traindata.iloc[:, [6]].fillna(method ='ffill')
 
-train = traindata.iloc[:, [6]].fillna(method ='ffill')
-test =  traindata.iloc[:, [6]].fillna(method ='ffill')
-
-
+train=traindatafill.values
+test=testdatafill.values
 
 print(len(train))
 print(len(test))
@@ -48,11 +49,16 @@ for i in range(len(prediction)):
     predict.append(test[i])
     outputs.append(predict)
 # 	print('predicted=%f, expected=%f' % (predictions[i], test[i]))
+
+#Calculate Error
 error = mean_squared_error(test, predictions)
 predictionsDf = DataFrame(outputs)
+
+#Write Output to CSV for analysis
 predictionsDf.to_csv('varOutput.csv', sep=',')
 print('Test MSE: %.3f' % error)
-# plot results
+
+# Plot results
 pyplot.plot(test)
 pyplot.plot(predictions, color='red')
 pyplot.show()
