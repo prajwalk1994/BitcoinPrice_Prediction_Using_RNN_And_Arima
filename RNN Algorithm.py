@@ -63,6 +63,17 @@ input_data = np.reshape(input_data, (len(input_data), 1, 1))
 predicted_BTC_price = regressor.predict(input_data)
 predicted_BTC_price = sc.inverse_transform(predicted_BTC_price)
 
+#Writing results to csv
+predictions = list()
+for t in range(len(test_set)):
+    output = list()
+    output.append(timestamps[t][0].strftime('%m-%d-%y'))
+    output.append(predicted_BTC_price[t][0])
+    predictions.append(output)
+predicted_BTC_price_df = DataFrame(predictions)
+predicted_BTC_price_df.to_csv('RNNOutput.csv', sep=',')
+
+
 plt.figure(figsize=(25,15), dpi=80, facecolor='w', edgecolor='k')
 ax = plt.gca()  
 plt.plot(test_set, color = 'red', label = 'Real BTC Price')
