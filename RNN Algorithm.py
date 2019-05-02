@@ -1,10 +1,16 @@
-import pandas as pd
-df = pd.read_csv('C:\\Users\\Aishwariya\\Desktop\\CMPE256 Project\\test.csv')
-from pandas import read_csv
-from pandas import datetime
-from statsmodels.tsa.arima_model import ARIMA
+#import python libraries
+import numpy as np 
+import pandas as pd 
+from matplotlib import pyplot as plt
 from pandas import DataFrame
-from matplotlib import pyplot
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
+
+# Importing the Keras libraries and packages
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+
 #from pandas.tools.plotting import autocorrelation_plot
 df = pd.read_csv('C:\Users\Aishwariya\Desktop\CMPE256 Project\test.csv')
 df
@@ -25,9 +31,7 @@ series
 series1 = series.iloc[:,[6]]
 series1
 
-import numpy as np 
-import pandas as pd 
-from matplotlib import pyplot as plt
+
 
 df = pd.read_csv("bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")
 df['date'] = pd.to_datetime(df['Timestamp'],unit='s').dt.date
@@ -45,9 +49,7 @@ X_train = training_set[0:len(training_set)-1]
 y_train = training_set[1:len(training_set)]
 X_train = np.reshape(X_train, (len(X_train), 1, 1))
 
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
+
 
 # Initialising the RNN
 regressor = Sequential()
