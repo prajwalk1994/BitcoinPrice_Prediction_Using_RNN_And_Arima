@@ -11,33 +11,22 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 
-#from pandas.tools.plotting import autocorrelation_plot
-df = pd.read_csv('C:\Users\Aishwariya\Desktop\CMPE256 Project\test.csv')
-df
+#Reading test and train data into dataframes
+df_train = pd.read_csv("train.csv")
+df_test = pd.read_csv("test.csv")
+df_train['date'] = pd.to_datetime(df_train['Timestamp'],unit='s').dt.date
+df_test['date'] = pd.to_datetime(df_train['Timestamp'], unit = 's').dt.date
 
-df.fillna(method='ffill', inplace=True)
-df 
-df
+#Grouping data by date
+group_train = df_train.groupby('date')
+group_test = df_test.groupby('date')
 
+#Finding mean price for both train and test data on each date
+Real_Price_train = group_train['Weighted_Price'].mean()
+Real_Price_test = group_test['Weighted_Price'].mean()
 
-def parser(x):
-	return pd.to_datetime(x, unit='s')
+timestamps = group_test['date'].unique().values
 
-series = read_csv('C:\\Users\\Aishwariya\\Desktop\\CMPE256 Project\\test.csv', header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
-series.fillna(method='ffill', inplace=True)
-series
-#autocorrelation_plot(series)
-#pyplot.show()
-series1 = series.iloc[:,[6]]
-series1
-
-
-
-df = pd.read_csv("bitstampUSD_1-min_data_2012-01-01_to_2018-11-11.csv")
-df['date'] = pd.to_datetime(df['Timestamp'],unit='s').dt.date
-group = df.groupby('date')
-Real_Price = group['Weighted_Price'].mean()
-prediction_days = 365
 df_train= Real_Price[:len(Real_Price)-prediction_days]
 df_test= Real_Price[len(Real_Price)-prediction_days:]
 training_set = df_train.values
