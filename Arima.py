@@ -1,11 +1,11 @@
 from pandas import read_csv
-from pandas import datetime
+from pandas import datetime, DataFrame
 from matplotlib import pyplot
 from pandas import DataFrame
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from statsmodels.tsa.arima_model import ARIMA
-import numpy as np
+import csv
 
 def parser(x):
     dateout = []
@@ -14,24 +14,35 @@ def parser(x):
     return dateout
 
 
-series = read_csv('CMPE-256-Large-Scale-Analytics-/data/bitstamp.csv',
+series = read_csv('data/train.csv',
                   header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 
 # print(series.head(10))
 # Split the data into individual dataframes
-price = series.iloc[:, [6]].fillna(method='ffill').head(1000).values
-open = series.iloc[:, [0]].fillna(method='ffill').head(1000).values
-high = series.iloc[:, [1]].fillna(method='ffill').head(1000).values
-low = series.iloc[:, [2]].fillna(method='ffill').head(1000).values
-close = series.iloc[:, [3]].fillna(method='ffill').head(1000).values
+price = series.iloc[:, [6]].fillna(method='ffill')
+open = series.iloc[:, [0]].fillna(method='ffill')
+high = series.iloc[:, [1]].fillna(method='ffill')
+low = series.iloc[:, [2]].fillna(method='ffill')
+close = series.iloc[:, [3]].fillna(method='ffill')
 
-# Split the individual dataframes to train and test
+# Get train values
 size = int(len(price) * 0.66)
-trainPrice, testPrice = price[0:size], price[size:len(price)]
-trainOpen, testOpen = open[0:size], open[size: len(price)]
-trainHigh, testHigh = high[0:size], high[size: len(price)]
-trainLow, testLow = low[0:size], low[size: len(price)]
-trainClose, testClose = close[0:size], close[size: len(price)]
+trainPrice = price.values
+trainOpen = open.values
+trainHigh = high.values
+trainLow = low.values
+trainClose = close.values
+
+#Read test data from CSV file
+testData = read_csv(
+    'data/test.csv', parse_dates=[0], squeeze=True, date_parser=parser)
+
+# Get test data values into objects
+testPrice = testData.iloc[:, [7]].fillna(method='ffill').values
+testOpen = testData.iloc[:, [1]].fillna(method='ffill').values
+testHigh = testData.iloc[:, [2]].fillna(method='ffill').values
+testLow = testData.iloc[:, [3]].fillna(method='ffill').values
+testClose = testData.iloc[:, [4]].fillna(method='ffill').values
 
 # Converting the dataframes into lists
 historyPrice = [x for x in trainPrice]
@@ -39,6 +50,9 @@ historyOpen = [x for x in trainOpen]
 historyHigh = [x for x in trainHigh]
 historyLow = [x for x in trainLow]
 historyClose = [x for x in trainClose]
+
+testLen = len(testPrice)
+predictions = list()
 
 # Predicting the price of Bitcoin
 for t in range(testLen):
@@ -62,6 +76,7 @@ for t in range(testLen):
     predict.append(outputHigh[0])
     predict.append(outputLow[0])
     predict.append(outputClose[0])
+    predictions.append(predict)
     # Append the output of the test to output object
     outputTest = list()
     outputTest.append(testPrice[t])
@@ -75,5 +90,8 @@ for t in range(testLen):
     historyHigh.append(testHigh[t])
     historyLow.append(testLow[t])
     historyClose.append(testClose[t])
+    #Add the testValues to history for 
 # Save the output to a csv file
-np.savetxt("arimaOutput.csv", outputTest, delimiter=",", fmt='%s', header=header)
+predictionsDf = DataFrame(predictions)
+predictionsDf.to_csv('arimaOutput.csv', sep=',')
+
