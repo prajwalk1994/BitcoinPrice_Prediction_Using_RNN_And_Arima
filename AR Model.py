@@ -19,32 +19,29 @@ def parser(x):
     return dateout
 
 
-traindata = read_csv('train.csv')
-testdata  = read_csv('test.csv')
+traindata = read_csv('/train.csv')
+testdata  = read_csv('/test.csv')
 
-traindata['date'] = to_datetime(traindata['Timestamp'],unit='s').dt.date
-testdata['date'] = to_datetime(testdata['Timestamp'],unit='s').dt.date
 
-trainDatagroup=traindata.groupby('date')
-train=trainDatagroup['Weighted_Price'].mean().values
-testDatagroup=testdata.groupby('date')
-test=testDatagroup['Weighted_Price'].mean().values
-timestamps = testDatagroup['date'].unique().values
+train = traindata.iloc[:, [6]].fillna(method ='ffill')
+test =  traindata.iloc[:, [6]].fillna(method ='ffill')
+
 
 
 print(len(train))
 print(len(test))
 
-
+#Model the train Set
 
 model = AR(train)
 model_fit = model.fit()
 print('Lag: %s' % model_fit.k_ar)
 print('Coefficients: %s' % model_fit.params)
-# make predictions
-predictions = model_fit.predict(start= len(train), end=len(train)+len(test)-1, dynamic=False)
+
+# Make predictions
+prediction = model_fit.predict(start= len(train), end=len(train)+len(test)-1, dynamic=False)
 outputs = list()
-for i in range(len(predictions)):
+for i in range(len(prediction)):
     predict = list()
     predict.append(timestamps[i][0].strftime('%m-%d-%y'))
     predict.append(predictions[i])
