@@ -73,6 +73,9 @@ for t in range(len(test_set)):
 predicted_BTC_price_df = DataFrame(predictions)
 predicted_BTC_price_df.to_csv('RNNOutput.csv', sep=',')
 
+#calculating MSE
+error = mean_squared_error(test_set,predicted_BTC_price)
+
 
 plt.figure(figsize=(25,15), dpi=80, facecolor='w', edgecolor='k')
 ax = plt.gca()  
